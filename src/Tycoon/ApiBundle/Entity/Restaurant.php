@@ -31,9 +31,13 @@ class Restaurant
     
     /**
      * @ORM\ManyToMany(targetEntity="Postcode", inversedBy="restaurants")
-     * @ORM\JoinTable(name="restaurant_postcode")
      */
     protected $postcodes;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="UserRestaurant", mappedBy="restaurants")
+     */
+    protected $userRestaurants;
 
     /**
      * @var string
@@ -52,9 +56,21 @@ class Restaurant
     /**
      * @var string
      *
-     * @ORM\Column(name="price", type="decimal")
+     * @ORM\Column(name="price", type="decimal", scale=2)
      */
     private $price = 0;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="score", type="decimal", scale=2)
+     */
+    private $score = 0;
+    
+    /**
+     * Variable used to calculate price
+     */
+    private $multiplier = 10;
 
     /**
      * @var float
@@ -71,20 +87,6 @@ class Restaurant
     private $longitude = 0;
 
     /**
-     * @var integer
-     *
-     * @ORM\Column(name="rating", type="integer")
-     */
-    private $rating;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="nb_rating", type="integer")
-     */
-    private $nbRating = 0;
-
-    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -97,14 +99,17 @@ class Restaurant
      * @ORM\Column(name="refreshed_at", type="datetime")
      */
     private $refreshedAt;
-
-
+    
+    private $refreshingDays = 1;
+    
+    
     /**
      * Constructor
      */
     public function __construct()
     {
         $this->postcodes = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->userRestaurants = new \Doctrine\Common\Collections\ArrayCollection();
     }
     
     /**
@@ -206,6 +211,13 @@ class Restaurant
      */
     public function getPrice()
     {
+        if (empty($this->price) || $this->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$this->getRefreshingTime())) {
+        // Last refreshed more than 1 day ago: update Price
+            $this->price = $this->score*$this->multiplier;
+            
+            $this->initRefreshedAt();
+        }
+        
         return $this->price;
     }
 
@@ -253,52 +265,6 @@ class Restaurant
     public function getLongitude()
     {
         return $this->longitude;
-    }
-
-    /**
-     * Set rating
-     *
-     * @param integer $rating
-     * @return Restaurant
-     */
-    public function setRating($rating)
-    {
-        $this->rating = $rating;
-
-        return $this;
-    }
-
-    /**
-     * Get rating
-     *
-     * @return integer 
-     */
-    public function getRating()
-    {
-        return $this->rating;
-    }
-
-    /**
-     * Set nbRating
-     *
-     * @param integer $nbRating
-     * @return Restaurant
-     */
-    public function setNbRating($nbRating)
-    {
-        $this->nbRating = $nbRating;
-
-        return $this;
-    }
-
-    /**
-     * Get nbRating
-     *
-     * @return integer 
-     */
-    public function getNbRating()
-    {
-        return $this->nbRating;
     }
 
     /**
@@ -394,4 +360,70 @@ class Restaurant
     {
         return $this->postcodes;
     }
+
+    /**
+     * Set score
+     *
+     * @param string $score
+     * @return Restaurant
+     */
+    public function setScore($score)
+    {
+        $this->score = $score;
+
+        return $this;
+    }
+
+    /**
+     * Get score
+     *
+     * @return string 
+     */
+    public function getScore()
+    {
+        return $this->score;
+    }
+
+    /**
+     * Add userRestaurants
+     *
+     * @param \Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants
+     * @return Restaurant
+     */
+    public function addUserRestaurant(\Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants)
+    {
+        $this->userRestaurants[] = $userRestaurants;
+
+        return $this;
+    }
+
+    /**
+     * Remove userRestaurants
+     *
+     * @param \Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants
+     */
+    public function removeUserRestaurant(\Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants)
+    {
+        $this->userRestaurants->removeElement($userRestaurants);
+    }
+
+    /**
+     * Get userRestaurants
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUserRestaurants()
+    {
+        return $this->userRestaurants;
+    }
+    
+    /**
+     * Get refreshing time
+     * 
+     * @return int
+     */
+    public function getRefreshingTime() {
+        return $this->refreshingDays*24*60*60;
+    }
+
 }

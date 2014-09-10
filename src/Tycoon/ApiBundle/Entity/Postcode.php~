@@ -24,7 +24,6 @@ class Postcode
     
     /**
      * @ORM\ManyToMany(targetEntity="Restaurant", mappedBy="postcodes")
-     * @ORM\JoinTable(name="restaurant_postcode")
      */
     protected $restaurants;
 
@@ -45,11 +44,19 @@ class Postcode
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="refreshed_at", type="datetime")
+     * @ORM\Column(name="refreshed_at", type="datetime", nullable=true)
      */
     private $refreshedAt;
 
 
+    /**
+     * Constructor
+     */
+    public function __construct()
+    {
+        $this->restaurants = new \Doctrine\Common\Collections\ArrayCollection();
+    }
+    
     /**
      * Get id
      *
@@ -129,10 +136,48 @@ class Postcode
         return $this->refreshedAt;
     }
     
+    public function initRefreshedAt() {
+        $this->refreshedAt = new \DateTime();
+    }
+    
     /**
      * @ORM\PrePersist
      */
     public function initCreatedAt() {
         $this->createdAt = new \DateTime();
+    }
+
+    /**
+     * Add restaurants
+     *
+     * @param \Tycoon\ApiBundle\Entity\Restaurant $restaurants
+     * @return Postcode
+     */
+    public function addRestaurant(\Tycoon\ApiBundle\Entity\Restaurant $restaurant)
+    {
+        $this->restaurants->removeElement($restaurant);
+        $this->restaurants[] = $restaurant;
+
+        return $this;
+    }
+
+    /**
+     * Remove restaurants
+     *
+     * @param \Tycoon\ApiBundle\Entity\Restaurant $restaurants
+     */
+    public function removeRestaurant(\Tycoon\ApiBundle\Entity\Restaurant $restaurant)
+    {
+        $this->restaurants->removeElement($restaurant);
+    }
+
+    /**
+     * Get restaurants
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getRestaurants()
+    {
+        return $this->restaurants;
     }
 }

@@ -24,7 +24,6 @@ class Postcode
     
     /**
      * @ORM\ManyToMany(targetEntity="Restaurant", mappedBy="postcodes")
-     * @ORM\JoinTable(name="restaurant_postcode")
      */
     protected $restaurants;
 
@@ -48,6 +47,8 @@ class Postcode
      * @ORM\Column(name="refreshed_at", type="datetime", nullable=true)
      */
     private $refreshedAt;
+    
+    private $refreshingDays = 30;
 
 
     /**
@@ -180,5 +181,14 @@ class Postcode
     public function getRestaurants()
     {
         return $this->restaurants;
+    }
+    
+    /**
+     * Get refreshing time
+     * 
+     * @return int
+     */
+    public function getRefreshingTime() {
+        return $this->refreshingDays*24*60*60;
     }
 }

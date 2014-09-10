@@ -31,9 +31,13 @@ class Restaurant
     
     /**
      * @ORM\ManyToMany(targetEntity="Postcode", inversedBy="restaurants")
-     * @ORM\JoinTable(name="restaurant_postcode")
      */
     protected $postcodes;
+    
+    /**
+     * @ORM\OneToMany(targetEntity="UserRestaurant", mappedBy="restaurants")
+     */
+    protected $userRestaurants;
 
     /**
      * @var string
@@ -54,35 +58,28 @@ class Restaurant
      *
      * @ORM\Column(name="price", type="decimal")
      */
-    private $price;
+    private $price = 0;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="score", type="decimal")
+     */
+    private $score = 0;
 
     /**
      * @var float
      *
      * @ORM\Column(name="latitude", type="float")
      */
-    private $latitude;
+    private $latitude = 0;
 
     /**
      * @var float
      *
      * @ORM\Column(name="longitude", type="float")
      */
-    private $longitude;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="rating", type="integer")
-     */
-    private $rating;
-
-    /**
-     * @var integer
-     *
-     * @ORM\Column(name="nb_rating", type="integer")
-     */
-    private $nbRating;
+    private $longitude = 0;
 
     /**
      * @var \DateTime
@@ -97,8 +94,7 @@ class Restaurant
      * @ORM\Column(name="refreshed_at", type="datetime")
      */
     private $refreshedAt;
-
-
+    
     /**
      * Get id
      *
@@ -248,52 +244,6 @@ class Restaurant
     }
 
     /**
-     * Set rating
-     *
-     * @param integer $rating
-     * @return Restaurant
-     */
-    public function setRating($rating)
-    {
-        $this->rating = $rating;
-
-        return $this;
-    }
-
-    /**
-     * Get rating
-     *
-     * @return integer 
-     */
-    public function getRating()
-    {
-        return $this->rating;
-    }
-
-    /**
-     * Set nbRating
-     *
-     * @param integer $nbRating
-     * @return Restaurant
-     */
-    public function setNbRating($nbRating)
-    {
-        $this->nbRating = $nbRating;
-
-        return $this;
-    }
-
-    /**
-     * Get nbRating
-     *
-     * @return integer 
-     */
-    public function getNbRating()
-    {
-        return $this->nbRating;
-    }
-
-    /**
      * Set createdAt
      *
      * @param \DateTime $createdAt
@@ -351,5 +301,95 @@ class Restaurant
      */
     public function initRefreshedAt() {
         $this->refreshedAt = new \DateTime();
+    }
+
+    /**
+     * Add postcodes
+     *
+     * @param \Tycoon\ApiBundle\Entity\Postcode $postcodes
+     * @return Restaurant
+     */
+    public function addPostcode(\Tycoon\ApiBundle\Entity\Postcode $postcode)
+    {
+        $this->postcodes->removeElement($postcode);
+        $this->postcodes[] = $postcode;
+
+        return $this;
+    }
+
+    /**
+     * Remove postcodes
+     *
+     * @param \Tycoon\ApiBundle\Entity\Postcode $postcodes
+     */
+    public function removePostcode(\Tycoon\ApiBundle\Entity\Postcode $postcode)
+    {
+        $this->postcodes->removeElement($postcode);
+    }
+
+    /**
+     * Get postcodes
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getPostcodes()
+    {
+        return $this->postcodes;
+    }
+
+    /**
+     * Set score
+     *
+     * @param string $score
+     * @return Restaurant
+     */
+    public function setScore($score)
+    {
+        $this->score = $score;
+
+        return $this;
+    }
+
+    /**
+     * Get score
+     *
+     * @return string 
+     */
+    public function getScore()
+    {
+        return $this->score;
+    }
+
+    /**
+     * Add userRestaurants
+     *
+     * @param \Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants
+     * @return Restaurant
+     */
+    public function addUserRestaurant(\Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants)
+    {
+        $this->userRestaurants[] = $userRestaurants;
+
+        return $this;
+    }
+
+    /**
+     * Remove userRestaurants
+     *
+     * @param \Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants
+     */
+    public function removeUserRestaurant(\Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants)
+    {
+        $this->userRestaurants->removeElement($userRestaurants);
+    }
+
+    /**
+     * Get userRestaurants
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getUserRestaurants()
+    {
+        return $this->userRestaurants;
     }
 }

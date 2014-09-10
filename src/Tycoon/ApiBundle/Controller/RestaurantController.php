@@ -17,13 +17,13 @@ class RestaurantController extends Controller {
      * 
      * Restaurants list
      */
-    public function listxAction() {
+    public function listAction() {
         $response = new JsonResponse();
         
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**
+        /**/
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
             'postcode' => 'EC2A',
@@ -45,63 +45,36 @@ class RestaurantController extends Controller {
                 $currentPostcode->setPostcode($requestDatas->postcode);
             }
 
-            if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d H:i:s') < date('Y-m-d H:i:s', time()-30*24*60*60)) {
+            if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d H:i:s') < date('Y-m-d H:i:s', time()-$currentPostcode->getRefreshingTime())) {
             // Last refreshed more than 30 days ago: call JustEat API to refresh datas
-                $result = $this->_callJusteat('restaurants?q='.$currentPostcode->getPostcode());
-
-                $JERestaurants = json_decode($result);
-
-                $restaurantRepo = $manager->getRepository('TycoonApiBundle:Restaurant');
-                foreach($JERestaurants->Restaurants as $JERestaurant) { 
-                    // Load restaurant
-                    $currentRestaurant = $restaurantRepo->findOneByJusteatId($JERestaurant->Id);
-
-                    if (empty($currentRestaurant)) {
-                    // Create restaurant
-                        $currentRestaurant = new Restaurant();
-                        $currentRestaurant->setJusteatId($JERestaurant->Id);
-                    }
-
-                    $currentRestaurant->setName($JERestaurant->Name);
-                    if (!empty($JERestaurant->Logo[0]->StandardResolutionURL)) {
-                        $currentRestaurant->setLogo($JERestaurant->Logo[0]->StandardResolutionURL);
-                    }
-
-                    if (!empty($JERestaurant->Latitude)) {
-                        $currentRestaurant->setLatitude($JERestaurant->Latitude);
-                    }
-                    if (!empty($JERestaurant->Longitude)) {
-                        $currentRestaurant->setLongitude($JERestaurant->Longitude);
-                    }
-                    $currentRestaurant->setRating($JERestaurant->RatingStars);
-                    if (!empty($JERestaurant->NumberOfRatings)) {
-                        $currentRestaurant->setNbRating($JERestaurant->NumberOfRatings);
-                    }
-
-                    $currentRestaurant->addPostcode($currentPostcode);
-                    $currentPostcode->addRestaurant($currentRestaurant);
-
-                    $currentRestaurant->initRefreshedAt();
-
-                    $manager->persist($currentRestaurant);
-                }
+                $currentPostcode = $this->_refreshPostcode($currentPostcode);
             }
 
             $restaurantsList = array();
             foreach($currentPostcode->getRestaurants() as $restaurant) {
+                
+                if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d H:i:s') < date('Y-m-d H:i:s', time()-$restaurant->getRefreshingTime())) {
+                // Last refreshed more than 1 day ago: call JustEat API to refresh datas
+                    $this->_refreshPostcode($currentPostcode);
+                }
+                
                 $restaurantsList[] = array(
                     'restaurantID' => $restaurant->getId(),
                     'name' => $restaurant->getName(),
                     'logo' => $restaurant->getLogo(),
                     'latitude' => $restaurant->getLatitude(),
-                    'longitude' => $restaurant->getLongitude()
+                    'longitude' => $restaurant->getLongitude(),
+                    'price' => $restaurant->getPrice()
                 );
+                
+                $manager->persist($restaurant);
             }
-
-            $currentPostcode->initRefreshedAt();
-
-            $manager->persist($currentPostcode);
+            
             $manager->flush();
+                
+                echo '<pre>';
+                print_r($restaurantsList);
+                die();
 
             $response->setData(array('restaurants' => $restaurantsList));
         } else {
@@ -111,6 +84,13 @@ class RestaurantController extends Controller {
     }
     
     
+    /**
+     * Call just eat API
+     * 
+     * @param $url string
+     * 
+     * @return $result string
+     */
     private function _callJusteat($url) {
         $ch = curl_init();
 
@@ -119,7 +99,8 @@ class RestaurantController extends Controller {
                 "Authorization: Basic VGVjaFRlc3RBUEk6dXNlcjI=",
                 "Accept-Tenant: uk",
                 "Accept-Language: en-GB",
-                "Accept-Version: 2"
+                "Accept-Version: 2",
+                "User-Agent: RestaurantTycoon"
             )
         );
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -130,5 +111,59 @@ class RestaurantController extends Controller {
         curl_close($ch);
         
         return $result;
+    }
+    
+    
+    /**
+     * Refresh restaurants by postcode
+     * 
+     * @param Postcode $currentPostcode
+     * @return Postcode
+     */
+    private function _refreshPostcode($currentPostcode) {
+        $manager = $this->getDoctrine()->getManager();
+        
+        $result = $this->_callJusteat('restaurants?q='.$currentPostcode->getPostcode());
+
+        $JERestaurants = json_decode($result);
+
+        $restaurantRepo = $manager->getRepository('TycoonApiBundle:Restaurant');
+        foreach($JERestaurants->Restaurants as $JERestaurant) { 
+            // Load restaurant
+            $currentRestaurant = $restaurantRepo->findOneByJusteatId($JERestaurant->Id);
+
+            if (empty($currentRestaurant)) {
+            // Create restaurant
+                $currentRestaurant = new Restaurant();
+                $currentRestaurant->setJusteatId($JERestaurant->Id);
+            }
+
+            $currentRestaurant->setName($JERestaurant->Name);
+            if (!empty($JERestaurant->Logo[0]->StandardResolutionURL)) {
+                $currentRestaurant->setLogo($JERestaurant->Logo[0]->StandardResolutionURL);
+            }
+
+            if (!empty($JERestaurant->Latitude)) {
+                $currentRestaurant->setLatitude($JERestaurant->Latitude);
+            }
+            if (!empty($JERestaurant->Longitude)) {
+                $currentRestaurant->setLongitude($JERestaurant->Longitude);
+            }
+            if (!empty($JERestaurant->Score)) {
+                $currentRestaurant->setScore($JERestaurant->Score);
+            }
+
+            $currentRestaurant->addPostcode($currentPostcode);
+            $currentPostcode->addRestaurant($currentRestaurant);
+
+            $manager->persist($currentRestaurant);
+        }
+        
+        $currentPostcode->initRefreshedAt();
+        
+        $manager->persist($currentPostcode);
+        $manager->flush();
+        
+        return $currentPostcode;
     }
 }

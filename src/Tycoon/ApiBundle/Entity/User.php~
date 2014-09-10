@@ -39,15 +39,7 @@ class User
      * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;
-    
-    
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->userRestaurants = new \Doctrine\Common\Collections\ArrayCollection();
-    }
+
 
     /**
      * Get id
@@ -137,5 +129,4 @@ class User
     {
         return $this->userRestaurants;
     }
-
 }
