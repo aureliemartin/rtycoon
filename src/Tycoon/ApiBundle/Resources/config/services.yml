@@ -1,0 +1,7 @@
+parameters:
+#    tycoon_api.example.class: Tycoon\ApiBundle\Example
+
+services:
+#    tycoon_api.example:
+#        class: %tycoon_api.example.class%
+#        arguments: [@service_id, "plain_value", %parameter%]

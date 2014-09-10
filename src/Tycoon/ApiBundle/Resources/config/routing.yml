@@ -1,0 +1,3 @@
+tycoon_api_restaurant:
+    resource:   "@TycoonApiBundle/Controller/RestaurantController.php"
+    type:       annotation

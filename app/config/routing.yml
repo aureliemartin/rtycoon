@@ -1,0 +1,4 @@
+tycoon_api:
+    resource: "@TycoonApiBundle/Resources/config/routing.yml"
+    prefix:   /api/
+
