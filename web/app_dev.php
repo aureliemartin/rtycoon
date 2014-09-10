@@ -1,7 +1,18 @@
 <?php
 
+
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Debug\Debug;
+
+error_reporting (E_ALL | E_STRICT); 
+	ini_set('display_errors', true); 
+	ini_set('html_errors', false); 
+	ini_set('display_startup_errors',true);		   
+        ini_set('log_errors', false); 
+	ini_set('error_prepend_string','<span style="color: red;">'); 
+	ini_set('error_append_string','<br /></span>'); 
+	ini_set('ignore_repeated_errors', true);
 
 // If you don't want to setup permissions the proper way, just uncomment the following PHP line
 // read http://symfony.com/doc/current/book/installation.html#configuration-and-setup for more information
