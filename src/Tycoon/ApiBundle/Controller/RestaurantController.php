@@ -45,7 +45,7 @@ class RestaurantController extends Controller {
                 $currentPostcode->setPostcode($requestDatas->postcode);
             }
 
-            if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d H:i:s') < date('Y-m-d H:i:s', time()/*-30*24*60*60*/)) {
+            if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d H:i:s') < date('Y-m-d H:i:s', time()-30*24*60*60)) {
             // Last refreshed more than 30 days ago: call JustEat API to refresh datas
                 $result = $this->_callJusteat('restaurants?q='.$currentPostcode->getPostcode());
 
