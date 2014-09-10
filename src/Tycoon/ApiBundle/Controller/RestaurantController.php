@@ -23,7 +23,7 @@ class RestaurantController extends Controller {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**
+        /**/
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
             'postcode' => 'EC2A',
