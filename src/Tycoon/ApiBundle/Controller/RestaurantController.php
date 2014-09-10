@@ -71,10 +71,6 @@ class RestaurantController extends Controller {
             }
             
             $manager->flush();
-                
-                echo '<pre>';
-                print_r($restaurantsList);
-                die();
 
             $response->setData(array('restaurants' => $restaurantsList));
         } else {
