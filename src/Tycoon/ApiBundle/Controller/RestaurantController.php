@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Tycoon\ApiBundle\Entity\Postcode;
 use Tycoon\ApiBundle\Entity\Restaurant;
+use Tycoon\ApiBundle\Entity\User;
 
 class RestaurantController extends Controller {
     
@@ -32,11 +33,21 @@ class RestaurantController extends Controller {
         $requestDatas = (object)$requestDatas;
         /**/
         
-        if (!empty($requestDatas->postcode)) {
+        if (!empty($requestDatas->postcode) && !empty($requestDatas->userFacebookID)) {
             $manager = $this->getDoctrine()->getManager();
-            $postcodeRepo = $manager->getRepository('TycoonApiBundle:Postcode');
+            
+            // Get current user
+            $userRepo = $manager->getRepository('TycoonApiBundle:User');
+            $currentUser = $userRepo->findOneByFacebookId($requestDatas->userFacebookID);
+            if (empty($currentUser)) {
+                $currentUser = new User();
+                $currentUser->setFacebookId($requestDatas->userFacebookID);
+                $manager->persist($currentUser);
+            }
+            
 
             // Load postcode
+            $postcodeRepo = $manager->getRepository('TycoonApiBundle:Postcode');
             $currentPostcode = $postcodeRepo->findOneByPostcode($requestDatas->postcode);
 
             if (empty($currentPostcode)) {
@@ -49,7 +60,7 @@ class RestaurantController extends Controller {
             // Last refreshed more than 30 days ago: call JustEat API to refresh datas
                 $currentPostcode = $this->_refreshPostcode($currentPostcode);
             }
-
+            
             $restaurantsList = array();
             foreach($currentPostcode->getRestaurants() as $restaurant) {
                 
@@ -64,7 +75,8 @@ class RestaurantController extends Controller {
                     'logo' => $restaurant->getLogo(),
                     'latitude' => $restaurant->getLatitude(),
                     'longitude' => $restaurant->getLongitude(),
-                    'price' => $restaurant->getPrice()
+                    'price' => $restaurant->getPrice(),
+                    'isOwner' => $currentUser->ownRestaurant($restaurant)
                 );
                 
                 $manager->persist($restaurant);
@@ -76,6 +88,7 @@ class RestaurantController extends Controller {
         } else {
             $response->setData(array('error' => 'Please send your postcode.'));
         }
+        
         return $response;
     }
     

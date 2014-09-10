@@ -9,6 +9,7 @@ use Doctrine\ORM\Mapping as ORM;
  *
  * @ORM\Table(name="user")
  * @ORM\Entity(repositoryClass="Tycoon\ApiBundle\Entity\UserRepository")
+ * @ORM\HasLifecycleCallbacks()
  */
 class User
 {
@@ -24,14 +25,15 @@ class User
     /**
      * @var integer
      *
-     * @ORM\Column(name="facebook_id", type="integer")
+     * @ORM\Column(name="facebook_id", type="string", length=50)
      */
     private $facebookId;
     
     /**
-     * @ORM\OneToMany(targetEntity="UserRestaurant", mappedBy="users")
+     * @ORM\OneToMany(targetEntity="UserRestaurant", mappedBy="user")
      */
     protected $userRestaurants;
+    private $restaurantIds = array();
 
     /**
      * @var \DateTime
@@ -104,28 +106,37 @@ class User
     {
         return $this->createdAt;
     }
+    
+    /**
+     * @ORM\PrePersist
+     */
+    public function initCreatedAt() {
+        $this->createdAt = new \DateTime();
+    }
 
     /**
      * Add userRestaurants
      *
-     * @param \Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants
+     * @param \Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurant
      * @return User
      */
-    public function addUserRestaurant(\Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants)
+    public function addUserRestaurant(\Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurant)
     {
-        $this->userRestaurants[] = $userRestaurants;
-
+        $this->userRestaurants[] = $userRestaurant;
+        $this->restaurantIds[] = $userRestaurant->getRestaurant()->getId();
+        
         return $this;
     }
 
     /**
      * Remove userRestaurants
      *
-     * @param \Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants
+     * @param \Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurant
      */
-    public function removeUserRestaurant(\Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants)
+    public function removeUserRestaurant(\Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurant)
     {
-        $this->userRestaurants->removeElement($userRestaurants);
+        $this->userRestaurants->removeElement($userRestaurant);
+        $this->restaurantIds = array_diff($this->restaurantIds, array($userRestaurant->getRestaurant()->getId()));
     }
 
     /**
@@ -136,6 +147,23 @@ class User
     public function getUserRestaurants()
     {
         return $this->userRestaurants;
+    }
+    
+    /**
+     * Does the user owns this restaurant
+     * 
+     * @param \Tycoon\ApiBundle\Entity\Restaurant $restaurant
+     * 
+     * @return boolean
+     */
+    public function ownRestaurant($restaurant) {
+        if (empty($this->restaurantIds)) {
+            foreach($this->getUserRestaurants() as $userRestaurant) {
+                $this->restaurantIds[] = $userRestaurant->getRestaurant()->getId();
+            }
+        }
+        
+        return in_array($restaurant->getId(), $this->restaurantIds);
     }
 
 }
