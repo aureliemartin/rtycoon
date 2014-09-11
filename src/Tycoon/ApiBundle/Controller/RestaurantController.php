@@ -125,6 +125,14 @@ class RestaurantController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
+        /**
+        echo 'REMOVE THIS TEST'."\n";
+        $requestDatas = array(
+            'restaurantID' => '343',
+            'userFacebookID' => '1100001103256836'
+        );
+        $requestDatas = (object)$requestDatas;
+        /**/
         
         if (!empty($requestDatas->userFacebookID) && !empty($requestDatas->restaurantID)) {
             $manager = $this->getDoctrine()->getManager();
@@ -193,6 +201,7 @@ class RestaurantController extends ApiController {
                     $restaurant['lastLogin'] = $userRestaurant->getLastConnectionAt()->format('Y-m-d');
                     $restaurant['profitSinceLastLogin'] = $userRestaurant->getProfit();
                     $restaurant['costSinceLastLogin'] = $userRestaurant->getCost();
+                    $restaurant['totalProfit'] = $userRestaurant->getTotalProfit() - $userRestaurant->getTotalCost();
                     
                     $manager->persist($userRestaurant);
                     $manager->persist($currentUser);
