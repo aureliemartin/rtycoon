@@ -206,7 +206,7 @@ class RestaurantController extends ApiController {
 
                 $manager->flush();
 
-                /**/
+                /**
                 echo '<pre>';
                 print_r($restaurant);
                 die();
