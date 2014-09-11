@@ -36,6 +36,14 @@ class User
     private $restaurantIds = array();
 
     /**
+     * @var decimal
+     *
+     * @ORM\Column(name="money", type="decimal", scale=2)
+     */
+    private $money = 0;
+    private $startingMoney = 10;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="created_at", type="datetime")
@@ -166,4 +174,43 @@ class User
         return in_array($restaurant->getId(), $this->restaurantIds);
     }
 
+
+    /**
+     * Set money
+     *
+     * @param string $money
+     * @return User
+     */
+    public function setMoney($money)
+    {
+        $this->money = $money;
+
+        return $this;
+    }
+
+    /**
+     * Get money
+     *
+     * @return string 
+     */
+    public function getMoney()
+    {
+        return $this->money;
+    }
+    
+    /**
+     * @ORM\PrePersist
+     */
+    public function initMoney() {
+        $this->money = $this->startingMoney;
+    }
+    
+    /**
+     * Pay money
+     * 
+     * @param float $price
+     */
+    public function pay($price) {
+        $this->money -= $price;
+    }
 }

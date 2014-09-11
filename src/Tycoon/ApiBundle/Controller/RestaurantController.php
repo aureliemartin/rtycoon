@@ -66,6 +66,7 @@ class RestaurantController extends ApiController {
                 if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$restaurant->getRefreshingTime())) {
                 // Last refreshed more than 1 day ago: call JustEat API to refresh datas
                     $this->_refreshPostcode($currentPostcode);
+                    $manager->refresh($restaurant);
                 }
                 
                 $restaurantsList[] = array(

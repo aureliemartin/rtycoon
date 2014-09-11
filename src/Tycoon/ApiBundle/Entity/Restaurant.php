@@ -54,14 +54,14 @@ class Restaurant
     private $logo;
 
     /**
-     * @var string
+     * @var decimal
      *
      * @ORM\Column(name="price", type="decimal", scale=2)
      */
     private $price = 0;
 
     /**
-     * @var string
+     * @var decimal
      *
      * @ORM\Column(name="score", type="decimal", scale=2)
      */
