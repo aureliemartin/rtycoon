@@ -43,6 +43,12 @@ class Restaurant
      * @ORM\OneToMany(targetEntity="UserRestaurant", mappedBy="restaurants")
      */
     protected $userRestaurants;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="orderRestaurants")
+     * @ORM\JoinTable(name="user_order_restaurant")
+     */
+    protected $orderUsers;
 
     /**
      * @var string
@@ -259,7 +265,7 @@ class Restaurant
      */
     public function getPrice()
     {
-        if (empty($this->price) || $this->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$this->getRefreshingTime())) {
+        if ($this->price == 0 || $this->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$this->getRefreshingTime())) {
         // Last refreshed more than 1 day ago: update Price
             $this->price = $this->score*$this->multiplier +500;
             
@@ -640,5 +646,38 @@ class Restaurant
     public function getEstimatedCost()
     {
         return $this->estimatedCost;
+    }
+
+    /**
+     * Add orderUsers
+     *
+     * @param \Tycoon\ApiBundle\Entity\User $orderUsers
+     * @return Restaurant
+     */
+    public function addOrderUser(\Tycoon\ApiBundle\Entity\User $orderUsers)
+    {
+        $this->orderUsers[] = $orderUsers;
+
+        return $this;
+    }
+
+    /**
+     * Remove orderUsers
+     *
+     * @param \Tycoon\ApiBundle\Entity\User $orderUsers
+     */
+    public function removeOrderUser(\Tycoon\ApiBundle\Entity\User $orderUsers)
+    {
+        $this->orderUsers->removeElement($orderUsers);
+    }
+
+    /**
+     * Get orderUsers
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getOrderUsers()
+    {
+        return $this->orderUsers;
     }
 }

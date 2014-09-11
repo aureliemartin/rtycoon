@@ -41,6 +41,13 @@ class User
      */
     protected $userRestaurants;
     private $restaurantIds = array();
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="Restaurant", inversedBy="orderUsers", cascade={"persist"})
+     * @ORM\JoinTable(name="user_order_restaurant")
+     */
+    protected $orderRestaurants;
+    private $orderRestaurantIds = array();
 
     /**
      * @var decimal
@@ -63,6 +70,15 @@ class User
      * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="refreshed_at", type="datetime", nullable=true)
+     */
+    private $refreshedAt;
+    
+    private $refreshingDays = 1;
     
     
     /**
@@ -71,6 +87,7 @@ class User
     public function __construct()
     {
         $this->userRestaurants = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->orderRestaurants = new \Doctrine\Common\Collections\ArrayCollection();
     }
 
     /**
@@ -187,6 +204,23 @@ class User
         
         return in_array($restaurant->getId(), $this->restaurantIds);
     }
+    
+    /**
+     * Does the user owns this restaurant
+     * 
+     * @param \Tycoon\ApiBundle\Entity\Restaurant $restaurant
+     * 
+     * @return boolean
+     */
+    public function orderedInRestaurant($restaurant) {
+        if (empty($this->restaurantIds)) {
+            foreach($this->getOrderRestaurants() as $orderRestaurant) {
+                $this->orderRestaurantIds[] = $orderRestaurant->getId();
+            }
+        }
+        
+        return in_array($restaurant->getId(), $this->orderRestaurantIds);
+    }
 
 
     /**
@@ -295,5 +329,77 @@ class User
     public function getJusteatEmail()
     {
         return $this->justeatEmail;
+    }
+
+    /**
+     * Set refreshedAt
+     *
+     * @param \DateTime $refreshedAt
+     * @return User
+     */
+    public function setRefreshedAt($refreshedAt)
+    {
+        $this->refreshedAt = $refreshedAt;
+
+        return $this;
+    }
+    
+    public function initRefreshedAt() {
+        $this->refreshedAt = new \DateTime();
+    }
+
+    /**
+     * Get refreshedAt
+     *
+     * @return \DateTime 
+     */
+    public function getRefreshedAt()
+    {
+        return $this->refreshedAt;
+    }
+    
+    /**
+     * Get refreshing time
+     * 
+     * @return int
+     */
+    public function getRefreshingTime() {
+        return $this->refreshingDays*24*60*60;
+    }
+
+    /**
+     * Add orderRestaurants
+     *
+     * @param \Tycoon\ApiBundle\Entity\Restaurant $orderRestaurant
+     * @return User
+     */
+    public function addOrderRestaurant(\Tycoon\ApiBundle\Entity\Restaurant $orderRestaurant)
+    {
+        $this->orderRestaurants->removeElement($orderRestaurant);
+        $this->orderRestaurants[] = $orderRestaurant;
+        $this->orderRestaurantIds[] = $orderRestaurant->getId();
+
+        return $this;
+    }
+
+    /**
+     * Remove orderRestaurants
+     *
+     * @param \Tycoon\ApiBundle\Entity\Restaurant $orderRestaurant
+     */
+    public function removeOrderRestaurant(\Tycoon\ApiBundle\Entity\Restaurant $orderRestaurant)
+    {
+        $this->orderRestaurants->removeElement($orderRestaurant);
+        $this->orderRestaurantIds = array_diff($this->orderRestaurantIds, array($orderRestaurant->getId()));
+    }
+
+    /**
+     * Get orderRestaurants
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getOrderRestaurants()
+    {
+        return $this->orderRestaurants;
     }
 }

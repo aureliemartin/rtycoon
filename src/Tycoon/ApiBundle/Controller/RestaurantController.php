@@ -26,7 +26,7 @@ class RestaurantController extends ApiController {
         /**
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
-            'postcode' => 'EC2A',
+            'postcode' => 'N225DE',
             'userFacebookID' => '1100001103256836'
         );
         $requestDatas = (object)$requestDatas;
@@ -60,6 +60,8 @@ class RestaurantController extends ApiController {
                 $currentPostcode = $this->_refreshPostcode($currentPostcode);
             }
             
+            $restaurantRepo = $manager->getRepository('TycoonApiBundle:Restaurant');
+            
             $restaurantsList = array();
             foreach($currentPostcode->getRestaurants() as $restaurant) {
                 
@@ -78,6 +80,35 @@ class RestaurantController extends ApiController {
                 }
                 
                 $isOwner = $currentUser->ownRestaurant($restaurant);
+                $restaurantPrice = $restaurant->getPrice();
+                $discountedPrice = $restaurantPrice;
+                
+                // User already ordered on Just Eat?
+                if (!empty($currentUser->getJusteatEmail())) {
+                    if (empty($currentUser->getRefreshedAt()) || $currentUser->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$currentUser->getRefreshingTime())) {
+                        // Last refreshed more than 1 day ago: call JustEat API to refresh datas
+                        $result = $this->_callJusteat('restaurant-ids/'.$currentUser->getJusteatEmail());
+
+                        $JERestaurantIds = json_decode($result);
+                        
+                        foreach($JERestaurantIds->RestaurantIds as $JERestaurantId) {
+                            // Load restaurant
+                            $orderRestaurant = $restaurantRepo->findOneByJusteatId($JERestaurantId);
+                            if (!empty($orderRestaurant)) {
+                                $currentUser->addOrderRestaurant($orderRestaurant);
+                            }
+                        }
+                        
+                        $currentUser->initRefreshedAt();
+                        
+                        $manager->persist($currentUser);
+                        $manager->flush();
+                    }
+                    
+                    if ($currentUser->orderedInRestaurant($restaurant)) {
+                        $discountedPrice = $restaurantPrice - ($restaurantPrice*0.05);
+                    }
+                }
                 
                 $restaurantsList[] = array(
                     'restaurantID' => $restaurant->getId(),
@@ -87,7 +118,8 @@ class RestaurantController extends ApiController {
                     'logo' => $restaurant->getLogo(),
                     'latitude' => $restaurant->getLatitude(),
                     'longitude' => $restaurant->getLongitude(),
-                    'price' => $restaurant->getPrice(),
+                    'price' => $restaurantPrice,
+                    'discountedPrice' => $discountedPrice,
                     'isOwner' => $isOwner,
                     'cuisines' => $cuisines
                 );

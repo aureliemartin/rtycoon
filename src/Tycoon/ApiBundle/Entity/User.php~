@@ -34,13 +34,18 @@ class User
      *
      * @ORM\Column(name="justeat_email", type="string", length=50)
      */
-    private $justeatEmail;
+    private $justeatEmail = '';
     
     /**
      * @ORM\OneToMany(targetEntity="UserRestaurant", mappedBy="user")
      */
     protected $userRestaurants;
     private $restaurantIds = array();
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="Restaurant", inversedBy="orderUsers", cascade={"persist"})
+     */
+    protected $orderRestaurants;
 
     /**
      * @var decimal
@@ -63,6 +68,15 @@ class User
      * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="refreshed_at", type="datetime", nullable=true)
+     */
+    private $refreshedAt;
+    
+    private $refreshingDays = 1;
     
     
     /**
@@ -272,5 +286,60 @@ class User
         }
         
         return $value;
+    }
+
+    /**
+     * Set justeatEmail
+     *
+     * @param string $justeatEmail
+     * @return User
+     */
+    public function setJusteatEmail($justeatEmail)
+    {
+        $this->justeatEmail = $justeatEmail;
+
+        return $this;
+    }
+
+    /**
+     * Get justeatEmail
+     *
+     * @return string 
+     */
+    public function getJusteatEmail()
+    {
+        return $this->justeatEmail;
+    }
+
+    /**
+     * Set refreshedAt
+     *
+     * @param \DateTime $refreshedAt
+     * @return User
+     */
+    public function setRefreshedAt($refreshedAt)
+    {
+        $this->refreshedAt = $refreshedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get refreshedAt
+     *
+     * @return \DateTime 
+     */
+    public function getRefreshedAt()
+    {
+        return $this->refreshedAt;
+    }
+    
+    /**
+     * Get refreshing time
+     * 
+     * @return int
+     */
+    public function getRefreshingTime() {
+        return $this->refreshingDays*24*60*60;
     }
 }

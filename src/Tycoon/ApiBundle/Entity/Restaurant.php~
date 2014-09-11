@@ -43,6 +43,11 @@ class Restaurant
      * @ORM\OneToMany(targetEntity="UserRestaurant", mappedBy="restaurants")
      */
     protected $userRestaurants;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="User", mappedBy="orderRestaurants")
+     */
+    protected $orderUsers;
 
     /**
      * @var string
@@ -77,7 +82,7 @@ class Restaurant
      *
      * @ORM\Column(name="url", type="string", length=255)
      */
-    private $url;
+    private $url = '';
 
     /**
      * @var decimal
@@ -110,7 +115,7 @@ class Restaurant
     /**
      * Variable used to calculate price
      */
-    private $multiplier = 100;
+    private $multiplier = 1000.15;
 
     /**
      * @var float
@@ -145,9 +150,9 @@ class Restaurant
     /**
      * Variable used to calculate profits
      */
-    private $minScore = 5;
-    private $profitMultiplier = 20;
-    private $costMultiplier = 10;
+    private $minScore = 0.5;
+    private $profitMultiplier = 220.2;
+    private $costMultiplier = 110.1;
     
     
     /**
@@ -261,9 +266,27 @@ class Restaurant
     {
         if (empty($this->price) || $this->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$this->getRefreshingTime())) {
         // Last refreshed more than 1 day ago: update Price
-            $this->price = $this->score*$this->multiplier;
+            $this->price = $this->score*$this->multiplier +500;
             
             $this->initRefreshedAt();
+            
+            // Estimate daily profit
+            $currentScore = $this->score;
+
+            $randNumber = mt_rand(0, 1000);
+            $randNumber = $randNumber/100;
+            
+            $lastScore = $currentScore - ($currentScore*$randNumber/100);
+
+            $score = $currentScore-$lastScore;
+            if ($score < $this->minScore) {
+                $score = $this->minScore;
+            }
+
+            $this->estimatedProfit = $score*$this->profitMultiplier;
+            
+            // Cost
+            $this->estimatedCost = $score*$this->costMultiplier;
         }
         
         return $this->price;
@@ -576,5 +599,51 @@ class Restaurant
     public function getUrl()
     {
         return $this->url;
+    }
+
+    /**
+     * Set estimatedProfit
+     *
+     * @param string $estimatedProfit
+     * @return Restaurant
+     */
+    public function setEstimatedProfit($estimatedProfit)
+    {
+        $this->estimatedProfit = $estimatedProfit;
+
+        return $this;
+    }
+
+    /**
+     * Get estimatedProfit
+     *
+     * @return string 
+     */
+    public function getEstimatedProfit()
+    {
+        return $this->estimatedProfit;
+    }
+
+    /**
+     * Set estimatedCost
+     *
+     * @param string $estimatedCost
+     * @return Restaurant
+     */
+    public function setEstimatedCost($estimatedCost)
+    {
+        $this->estimatedCost = $estimatedCost;
+
+        return $this;
+    }
+
+    /**
+     * Get estimatedCost
+     *
+     * @return string 
+     */
+    public function getEstimatedCost()
+    {
+        return $this->estimatedCost;
     }
 }
