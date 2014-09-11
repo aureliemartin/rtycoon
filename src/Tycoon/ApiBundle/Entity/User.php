@@ -41,7 +41,7 @@ class User
      * @ORM\Column(name="money", type="decimal", scale=2)
      */
     private $money = 0;
-    private $startingMoney = 5000;
+    private $startingMoney = 4000;
 
     /**
      * @var integer

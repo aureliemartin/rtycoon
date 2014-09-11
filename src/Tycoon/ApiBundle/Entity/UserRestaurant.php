@@ -107,7 +107,7 @@ class UserRestaurant
     /**
      * Variable used to calculate profits
      */
-    private $minScore = 5;
+    private $minScore = 0.5;
     private $profitMultiplier = 20.2;
     private $costMultiplier = 10.1;
 

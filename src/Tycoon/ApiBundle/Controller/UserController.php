@@ -23,13 +23,6 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**
-        echo 'REMOVE THIS TEST'."\n";
-        $requestDatas = array(
-            'userFacebookID' => '1000041103256836'
-        );
-        $requestDatas = (object)$requestDatas;
-        /**/
         
         if (!empty($requestDatas->userFacebookID)) {
             $manager = $this->getDoctrine()->getManager();
@@ -75,14 +68,6 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**/
-        echo 'REMOVE THIS TEST'."\n";
-        $requestDatas = array(
-            'userFacebookID' => '830297450337922',
-            'restaurantID' => 1
-        );
-        $requestDatas = (object)$requestDatas;
-        /**/
         
         if (!empty($requestDatas->userFacebookID) && !empty($requestDatas->restaurantID)) {
             $manager = $this->getDoctrine()->getManager();
@@ -172,14 +157,6 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**
-        echo 'REMOVE THIS TEST'."\n";
-        $requestDatas = array(
-            'userFacebookID' => '1000041103256836',
-            'restaurantID' => 1
-        );
-        $requestDatas = (object)$requestDatas;
-        /**/
         
         if (!empty($requestDatas->userFacebookID) && !empty($requestDatas->restaurantID)) {
             $manager = $this->getDoctrine()->getManager();
@@ -262,13 +239,6 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**
-        echo 'REMOVE THIS TEST'."\n";
-        $requestDatas = array(
-            'userFacebookID' => '1000041103256836'
-        );
-        $requestDatas = (object)$requestDatas;
-        /**/
         
         if (!empty($requestDatas->userFacebookID)) {
             $manager = $this->getDoctrine()->getManager();
@@ -330,12 +300,6 @@ class UserController extends ApiController {
             }
             
             $manager->flush();
-        
-            /**
-            echo '<pre>';
-            print_r($restaurantsList);
-            die();
-            /**/
 
             $response->setData(array('restaurants' => $restaurantsList));
         } else {

@@ -23,7 +23,7 @@ class RestaurantController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**
+        /**/
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
             'postcode' => 'EC2A',
@@ -122,14 +122,6 @@ class RestaurantController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**
-        echo 'REMOVE THIS TEST'."\n";
-        $requestDatas = array(
-            'userFacebookID' => '8306297450337922',
-            'restaurantID' => 1
-        );
-        $requestDatas = (object)$requestDatas;
-        /**/
         
         if (!empty($requestDatas->userFacebookID) && !empty($requestDatas->restaurantID)) {
             $manager = $this->getDoctrine()->getManager();
@@ -205,12 +197,6 @@ class RestaurantController extends ApiController {
                 $manager->persist($currentRestaurant);
 
                 $manager->flush();
-
-                /**
-                echo '<pre>';
-                print_r($restaurant);
-                die();
-                /**/
 
                 $response->setData(array('restaurant' => $restaurant));
             } else {

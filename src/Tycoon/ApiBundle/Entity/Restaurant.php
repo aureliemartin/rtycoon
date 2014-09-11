@@ -145,9 +145,9 @@ class Restaurant
     /**
      * Variable used to calculate profits
      */
-    private $minScore = 5;
-    private $profitMultiplier = 20.2;
-    private $costMultiplier = 10.1;
+    private $minScore = 0.5;
+    private $profitMultiplier = 220.2;
+    private $costMultiplier = 110.1;
     
     
     /**
@@ -261,18 +261,17 @@ class Restaurant
     {
         if (empty($this->price) || $this->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$this->getRefreshingTime())) {
         // Last refreshed more than 1 day ago: update Price
-            $this->price = $this->score*$this->multiplier;
+            $this->price = $this->score*$this->multiplier +500;
             
             $this->initRefreshedAt();
             
             // Estimate daily profit
             $currentScore = $this->score;
 
-            $randNumber = mt_rand(0, 700);
-            $randNumber -= 200;
+            $randNumber = mt_rand(0, 1000);
             $randNumber = $randNumber/100;
             
-            $lastScore = $currentScore + ($currentScore*$randNumber/100);
+            $lastScore = $currentScore - ($currentScore*$randNumber/100);
 
             $score = $currentScore-$lastScore;
             if ($score < $this->minScore) {
@@ -280,7 +279,6 @@ class Restaurant
             }
 
             $this->estimatedProfit = $score*$this->profitMultiplier;
-            
             
             // Cost
             $this->estimatedCost = $score*$this->costMultiplier;
