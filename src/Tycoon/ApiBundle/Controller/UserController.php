@@ -124,14 +124,6 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**
-        echo 'REMOVE THIS TEST'."\n";
-        $requestDatas = array(
-            'userFacebookID' => '1100001103256836',
-            'restaurantID' => '343'
-        );
-        $requestDatas = (object)$requestDatas;
-        /**/
         
         if (!empty($requestDatas->userFacebookID) && !empty($requestDatas->restaurantID)) {
             $manager = $this->getDoctrine()->getManager();
