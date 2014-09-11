@@ -68,7 +68,7 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**/
+        /**
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
             'userFacebookID' => '1100001103256836',
@@ -91,6 +91,8 @@ class UserController extends ApiController {
             $currentUser->setJusteatEmail($requestDatas->emailAddress);
             
             $manager->persist($currentUser);
+            
+            $manager->flush();
 
             $response->setData(
                 array(
@@ -104,8 +106,6 @@ class UserController extends ApiController {
                     )
                 )
             );
-            
-            $manager->flush();
         } else {
             $response->setData(array('error' => 'Please send your Facebook ID.'));
         }
