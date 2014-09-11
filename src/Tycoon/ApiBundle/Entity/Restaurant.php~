@@ -30,7 +30,7 @@ class Restaurant
     private $justeatId;
     
     /**
-     * @ORM\ManyToMany(targetEntity="Postcode", inversedBy="restaurants")
+     * @ORM\ManyToMany(targetEntity="Postcode", inversedBy="restaurants", cascade={"persist"})
      */
     protected $postcodes;
     
@@ -54,9 +54,30 @@ class Restaurant
     /**
      * @var string
      *
+     * @ORM\Column(name="address", type="string", length=255)
+     */
+    private $address;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="city", type="string", length=255)
+     */
+    private $city;
+    
+    /**
+     * @var string
+     *
      * @ORM\Column(name="logo", type="string", length=255)
      */
     private $logo;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="url", type="string", length=255)
+     */
+    private $url;
 
     /**
      * @var decimal
@@ -68,6 +89,20 @@ class Restaurant
     /**
      * @var decimal
      *
+     * @ORM\Column(name="estimated_profit", type="decimal", scale=2)
+     */
+    private $estimatedProfit = 0;
+
+    /**
+     * @var decimal
+     *
+     * @ORM\Column(name="estimated_cost", type="decimal", scale=2)
+     */
+    private $estimatedCost = 0;
+
+    /**
+     * @var decimal
+     *
      * @ORM\Column(name="score", type="decimal", scale=2)
      */
     private $score = 0;
@@ -75,7 +110,7 @@ class Restaurant
     /**
      * Variable used to calculate price
      */
-    private $multiplier = 10;
+    private $multiplier = 100;
 
     /**
      * @var float
@@ -107,6 +142,13 @@ class Restaurant
     
     private $refreshingDays = 1;
     
+    /**
+     * Variable used to calculate profits
+     */
+    private $minScore = 5;
+    private $profitMultiplier = 20;
+    private $costMultiplier = 10;
+    
     
     /**
      * Constructor
@@ -115,6 +157,7 @@ class Restaurant
     {
         $this->postcodes = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userRestaurants = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->cuisines = new \Doctrine\Common\Collections\ArrayCollection();
     }
     
     /**
@@ -431,4 +474,107 @@ class Restaurant
         return $this->refreshingDays*24*60*60;
     }
 
+
+    /**
+     * Add cuisines
+     *
+     * @param \Tycoon\ApiBundle\Entity\Cuisine $cuisine
+     * @return Restaurant
+     */
+    public function addCuisine(\Tycoon\ApiBundle\Entity\Cuisine $cuisine)
+    {
+        $this->cuisines->removeElement($cuisine);
+        $this->cuisines[] = $cuisine;
+
+        return $this;
+    }
+
+    /**
+     * Remove cuisines
+     *
+     * @param \Tycoon\ApiBundle\Entity\Cuisine $cuisines
+     */
+    public function removeCuisine(\Tycoon\ApiBundle\Entity\Cuisine $cuisines)
+    {
+        $this->cuisines->removeElement($cuisines);
+    }
+
+    /**
+     * Get cuisines
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getCuisines()
+    {
+        return $this->cuisines;
+    }
+
+    /**
+     * Set address
+     *
+     * @param string $address
+     * @return Restaurant
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get address
+     *
+     * @return string 
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    /**
+     * Set city
+     *
+     * @param string $city
+     * @return Restaurant
+     */
+    public function setCity($city)
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    /**
+     * Get city
+     *
+     * @return string 
+     */
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    /**
+     * Set url
+     *
+     * @param string $url
+     * @return Restaurant
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Get url
+     *
+     * @return string 
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
 }

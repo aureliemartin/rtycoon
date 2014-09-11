@@ -41,7 +41,7 @@ class User
      * @ORM\Column(name="money", type="decimal", scale=2)
      */
     private $money = 0;
-    private $startingMoney = 100;
+    private $startingMoney = 1000;
 
     /**
      * @var integer
@@ -251,5 +251,19 @@ class User
     public function getRank()
     {
         return $this->rank;
+    }
+    
+    public function getValue() {
+        $value = $this->getMoney();
+
+        // Load restaurants
+        $userRestaurants = $this->getUserRestaurants();
+        foreach($userRestaurants as $userRestaurant) {
+            // Load restaurant
+            $currentRestaurant = $userRestaurant->getRestaurant();
+            $value += $currentRestaurant->getPrice();
+        }
+        
+        return $value;
     }
 }

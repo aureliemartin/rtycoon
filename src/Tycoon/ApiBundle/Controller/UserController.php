@@ -49,6 +49,7 @@ class UserController extends ApiController {
                         'user' => array(
                             'userID' => $currentUser->getId(),
                             'money' => $currentUser->getMoney(),
+                            'value' => $currentUser->getValue(),
                             'rank' => $currentUser->getRank()
                         )
                     )
@@ -74,11 +75,11 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**
+        /**/
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
-            'userFacebookID' => '1000041103256836',
-            'restaurantID' => 2
+            'userFacebookID' => '830297450337922',
+            'restaurantID' => 1
         );
         $requestDatas = (object)$requestDatas;
         /**/
@@ -314,7 +315,9 @@ class UserController extends ApiController {
                 $restaurantsList[] = array(
                     'restaurantID' => $currentRestaurant->getId(),
                     'name' => $currentRestaurant->getName(),
+                    'address' => $currentRestaurant->getAddress().' '.$currentRestaurant->getCity(),
                     'logo' => $currentRestaurant->getLogo(),
+                    'url' => $currentRestaurant->getUrl(),
                     'latitude' => $currentRestaurant->getLatitude(),
                     'longitude' => $currentRestaurant->getLongitude(),
                     'price' => $currentRestaurant->getPrice(),
@@ -323,6 +326,7 @@ class UserController extends ApiController {
                 );
                 
                 $manager->persist($currentRestaurant);
+                $manager->persist($currentUser);
             }
             
             $manager->flush();

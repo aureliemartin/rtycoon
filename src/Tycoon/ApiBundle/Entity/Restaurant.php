@@ -54,9 +54,30 @@ class Restaurant
     /**
      * @var string
      *
+     * @ORM\Column(name="address", type="string", length=255)
+     */
+    private $address;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="city", type="string", length=255)
+     */
+    private $city;
+    
+    /**
+     * @var string
+     *
      * @ORM\Column(name="logo", type="string", length=255)
      */
     private $logo;
+    
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="url", type="string", length=255)
+     */
+    private $url;
 
     /**
      * @var decimal
@@ -68,6 +89,20 @@ class Restaurant
     /**
      * @var decimal
      *
+     * @ORM\Column(name="estimated_profit", type="decimal", scale=2)
+     */
+    private $estimatedProfit = 0;
+
+    /**
+     * @var decimal
+     *
+     * @ORM\Column(name="estimated_cost", type="decimal", scale=2)
+     */
+    private $estimatedCost = 0;
+
+    /**
+     * @var decimal
+     *
      * @ORM\Column(name="score", type="decimal", scale=2)
      */
     private $score = 0;
@@ -75,7 +110,7 @@ class Restaurant
     /**
      * Variable used to calculate price
      */
-    private $multiplier = 10;
+    private $multiplier = 100;
 
     /**
      * @var float
@@ -106,6 +141,13 @@ class Restaurant
     private $refreshedAt;
     
     private $refreshingDays = 1;
+    
+    /**
+     * Variable used to calculate profits
+     */
+    private $minScore = 5;
+    private $profitMultiplier = 20.2;
+    private $costMultiplier = 10.1;
     
     
     /**
@@ -222,6 +264,26 @@ class Restaurant
             $this->price = $this->score*$this->multiplier;
             
             $this->initRefreshedAt();
+            
+            // Estimate daily profit
+            $currentScore = $this->score;
+
+            $randNumber = mt_rand(0, 700);
+            $randNumber -= 200;
+            $randNumber = $randNumber/100;
+            
+            $lastScore = $currentScore + ($currentScore*$randNumber/100);
+
+            $score = $currentScore-$lastScore;
+            if ($score < $this->minScore) {
+                $score = $this->minScore;
+            }
+
+            $this->estimatedProfit = $score*$this->profitMultiplier;
+            
+            
+            // Cost
+            $this->estimatedCost = $score*$this->costMultiplier;
         }
         
         return $this->price;
@@ -465,5 +527,120 @@ class Restaurant
     public function getCuisines()
     {
         return $this->cuisines;
+    }
+
+    /**
+     * Set address
+     *
+     * @param string $address
+     * @return Restaurant
+     */
+    public function setAddress($address)
+    {
+        $this->address = $address;
+
+        return $this;
+    }
+
+    /**
+     * Get address
+     *
+     * @return string 
+     */
+    public function getAddress()
+    {
+        return $this->address;
+    }
+
+    /**
+     * Set city
+     *
+     * @param string $city
+     * @return Restaurant
+     */
+    public function setCity($city)
+    {
+        $this->city = $city;
+
+        return $this;
+    }
+
+    /**
+     * Get city
+     *
+     * @return string 
+     */
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    /**
+     * Set url
+     *
+     * @param string $url
+     * @return Restaurant
+     */
+    public function setUrl($url)
+    {
+        $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Get url
+     *
+     * @return string 
+     */
+    public function getUrl()
+    {
+        return $this->url;
+    }
+
+    /**
+     * Set estimatedProfit
+     *
+     * @param string $estimatedProfit
+     * @return Restaurant
+     */
+    public function setEstimatedProfit($estimatedProfit)
+    {
+        $this->estimatedProfit = $estimatedProfit;
+
+        return $this;
+    }
+
+    /**
+     * Get estimatedProfit
+     *
+     * @return string 
+     */
+    public function getEstimatedProfit()
+    {
+        return $this->estimatedProfit;
+    }
+
+    /**
+     * Set estimatedCost
+     *
+     * @param string $estimatedCost
+     * @return Restaurant
+     */
+    public function setEstimatedCost($estimatedCost)
+    {
+        $this->estimatedCost = $estimatedCost;
+
+        return $this;
+    }
+
+    /**
+     * Get estimatedCost
+     *
+     * @return string 
+     */
+    public function getEstimatedCost()
+    {
+        return $this->estimatedCost;
     }
 }

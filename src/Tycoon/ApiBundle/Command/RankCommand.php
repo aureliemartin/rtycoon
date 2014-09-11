@@ -23,16 +23,7 @@ class RankCommand extends ContainerAwareCommand {
         // Sort users
         $rankedUsers = array();
         foreach($users as $user) {
-            $value = $user->getMoney();
-            
-            // Load restaurants
-            $userRestaurants = $user->getUserRestaurants();
-            foreach($userRestaurants as $userRestaurant) {
-                // Load restaurant
-                $currentRestaurant = $userRestaurant->getRestaurant();
-                
-                $value += $currentRestaurant->getPrice();
-            }
+            $value = $user->getValue();
             
             $rankedUsers[str_pad(round($value), 10, 0, STR_PAD_LEFT).'_'.str_pad($user->getId(), 5, 0, STR_PAD_LEFT)] = $user;
         }
@@ -76,6 +67,13 @@ class RankCommand extends ContainerAwareCommand {
             }
 
             $currentRestaurant->setName($JERestaurant->Name);
+            $currentRestaurant->setAddress($JERestaurant->Address);
+            if (!empty($JERestaurant->City)) {
+                $currentRestaurant->setCity($JERestaurant->City);
+            }
+            if (!empty($JERestaurant->Url)) {
+                $currentRestaurant->setUrl($JERestaurant->Url);
+            }
             if (!empty($JERestaurant->Logo[0]->StandardResolutionURL)) {
                 $currentRestaurant->setLogo($JERestaurant->Logo[0]->StandardResolutionURL);
             }

@@ -36,6 +36,13 @@ class ApiController extends Controller {
             }
 
             $currentRestaurant->setName($JERestaurant->Name);
+            $currentRestaurant->setAddress($JERestaurant->Address);
+            if (!empty($JERestaurant->City)) {
+                $currentRestaurant->setCity($JERestaurant->City);
+            }
+            if (!empty($JERestaurant->Url)) {
+                $currentRestaurant->setUrl($JERestaurant->Url);
+            }
             if (!empty($JERestaurant->Logo[0]->StandardResolutionURL)) {
                 $currentRestaurant->setLogo($JERestaurant->Logo[0]->StandardResolutionURL);
             }
