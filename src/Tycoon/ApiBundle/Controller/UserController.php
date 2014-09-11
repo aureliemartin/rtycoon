@@ -23,7 +23,7 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**/
+        /**
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
             'userFacebookID' => '1000041103256836'
