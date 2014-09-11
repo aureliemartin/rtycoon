@@ -209,7 +209,7 @@ class UserRestaurant
     /**
      * @ORM\PrePersist
      */
-    public function lastConnectionAt() {
+    public function initLastConnectionAt() {
         $this->lastConnectionAt = new \DateTime();
     }
 

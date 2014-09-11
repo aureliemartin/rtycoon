@@ -58,6 +58,62 @@ class UserController extends ApiController {
     }
     
     /**
+     * @Route("/user/justeatlink/")
+     * 
+     * Link a user to his Just Eat email
+     */
+    public function justeatlinkAction() {
+        $response = new JsonResponse();
+        
+        // Get POST
+        $datas = file_get_contents('php://input');
+	$requestDatas = json_decode($datas);
+        /**/
+        echo 'REMOVE THIS TEST'."\n";
+        $requestDatas = array(
+            'userFacebookID' => '1100001103256836',
+            'emailAddress' => 'am@orogo.com'
+        );
+        $requestDatas = (object)$requestDatas;
+        /**/
+        
+        if (!empty($requestDatas->userFacebookID) || !empty($requestDatas->emailAddress)) {
+            $manager = $this->getDoctrine()->getManager();
+            
+            // Get current user
+            $userRepo = $manager->getRepository('TycoonApiBundle:User');
+            $currentUser = $userRepo->findOneByFacebookId($requestDatas->userFacebookID);
+            if (empty($currentUser)) {
+                $currentUser = new User();
+                $currentUser->setFacebookId($requestDatas->userFacebookID);
+            }
+            
+            $currentUser->setJusteatEmail($requestDatas->emailAddress);
+            
+            $manager->persist($currentUser);
+
+            $response->setData(
+                array(
+                    'success' => array(
+                        'user' => array(
+                            'userID' => $currentUser->getId(),
+                            'money' => $currentUser->getMoney(),
+                            'value' => $currentUser->getValue(),
+                            'rank' => $currentUser->getRank()
+                        )
+                    )
+                )
+            );
+            
+            $manager->flush();
+        } else {
+            $response->setData(array('error' => 'Please send your Facebook ID.'));
+        }
+        
+        return $response;
+    }
+    
+    /**
      * @Route("/user/buyrestaurant/")
      * 
      * Buy a restaurant

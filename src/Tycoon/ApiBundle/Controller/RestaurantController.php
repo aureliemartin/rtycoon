@@ -27,7 +27,7 @@ class RestaurantController extends ApiController {
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
             'postcode' => 'EC2A',
-            'userFacebookID' => '100001103256836'
+            'userFacebookID' => '1100001103256836'
         );
         $requestDatas = (object)$requestDatas;
         /**/

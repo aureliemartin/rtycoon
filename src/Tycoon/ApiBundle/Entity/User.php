@@ -28,6 +28,13 @@ class User
      * @ORM\Column(name="facebook_id", type="string", length=50)
      */
     private $facebookId;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="justeat_email", type="string", length=50)
+     */
+    private $justeatEmail = '';
     
     /**
      * @ORM\OneToMany(targetEntity="UserRestaurant", mappedBy="user")
@@ -265,5 +272,28 @@ class User
         }
         
         return $value;
+    }
+
+    /**
+     * Set justeatEmail
+     *
+     * @param string $justeatEmail
+     * @return User
+     */
+    public function setJusteatEmail($justeatEmail)
+    {
+        $this->justeatEmail = $justeatEmail;
+
+        return $this;
+    }
+
+    /**
+     * Get justeatEmail
+     *
+     * @return string 
+     */
+    public function getJusteatEmail()
+    {
+        return $this->justeatEmail;
     }
 }
