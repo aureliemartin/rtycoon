@@ -77,7 +77,7 @@ class Restaurant
      *
      * @ORM\Column(name="url", type="string", length=255)
      */
-    private $url;
+    private $url = '';
 
     /**
      * @var decimal
@@ -110,7 +110,7 @@ class Restaurant
     /**
      * Variable used to calculate price
      */
-    private $multiplier = 100;
+    private $multiplier = 1000.15;
 
     /**
      * @var float
