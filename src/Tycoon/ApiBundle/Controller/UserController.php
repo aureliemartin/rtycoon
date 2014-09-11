@@ -48,7 +48,8 @@ class UserController extends ApiController {
                     'success' => array(
                         'user' => array(
                             'userID' => $currentUser->getId(),
-                            'money' => $currentUser->getMoney()
+                            'money' => $currentUser->getMoney(),
+                            'rank' => $currentUser->getRank()
                         )
                     )
                 )
@@ -282,7 +283,6 @@ class UserController extends ApiController {
             
 
             // Load restaurants
-            $restaurantRepo = $manager->getRepository('TycoonApiBundle:Restaurant');
             $userRestaurants = $currentUser->getUserRestaurants();
             
             $restaurantsList = array();
@@ -318,7 +318,7 @@ class UserController extends ApiController {
                     'latitude' => $currentRestaurant->getLatitude(),
                     'longitude' => $currentRestaurant->getLongitude(),
                     'price' => $currentRestaurant->getPrice(),
-                    'isOwner' => 1,
+                    'isOwner' => true,
                     'cuisines' => $cuisines
                 );
                 

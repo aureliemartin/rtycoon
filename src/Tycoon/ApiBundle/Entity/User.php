@@ -41,7 +41,14 @@ class User
      * @ORM\Column(name="money", type="decimal", scale=2)
      */
     private $money = 0;
-    private $startingMoney = 10;
+    private $startingMoney = 100;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="rank", type="integer")
+     */
+    private $rank = 0;
 
     /**
      * @var \DateTime
@@ -221,5 +228,28 @@ class User
      */
     public function earn($price) {
         $this->money += $price;
+    }
+
+    /**
+     * Set rank
+     *
+     * @param integer $rank
+     * @return User
+     */
+    public function setRank($rank)
+    {
+        $this->rank = $rank;
+
+        return $this;
+    }
+
+    /**
+     * Get rank
+     *
+     * @return integer 
+     */
+    public function getRank()
+    {
+        return $this->rank;
     }
 }

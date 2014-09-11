@@ -41,6 +41,14 @@ class User
      * @ORM\Column(name="money", type="decimal", scale=2)
      */
     private $money = 0;
+    private $startingMoney = 100;
+
+    /**
+     * @var integer
+     *
+     * @ORM\Column(name="rank", type="integer")
+     */
+    private $rank = 0;
 
     /**
      * @var \DateTime
@@ -48,6 +56,15 @@ class User
      * @ORM\Column(name="created_at", type="datetime")
      */
     private $createdAt;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="refreshed_at", type="datetime", nullable=true)
+     */
+    private $refreshedAt;
+    
+    private $refreshingDays = 30;
     
     
     /**
@@ -173,4 +190,82 @@ class User
         return in_array($restaurant->getId(), $this->restaurantIds);
     }
 
+
+    /**
+     * Set money
+     *
+     * @param string $money
+     * @return User
+     */
+    public function setMoney($money)
+    {
+        $this->money = $money;
+
+        return $this;
+    }
+
+    /**
+     * Get money
+     *
+     * @return string 
+     */
+    public function getMoney()
+    {
+        return $this->money;
+    }
+    
+    /**
+     * @ORM\PrePersist
+     */
+    public function initMoney() {
+        $this->money = $this->startingMoney;
+    }
+    
+    /**
+     * Pay money
+     * 
+     * @param float $price
+     */
+    public function pay($price) {
+        $this->money -= $price;
+    }
+    
+    /**
+     * Earn money
+     * 
+     * @param float $price
+     */
+    public function earn($price) {
+        $this->money += $price;
+    }
+
+    /**
+     * Set rank
+     *
+     * @param integer $rank
+     * @return User
+     */
+    public function setRank($rank)
+    {
+        $this->rank = $rank;
+
+        return $this;
+    }
+
+    /**
+     * Get rank
+     *
+     * @return integer 
+     */
+    public function getRank()
+    {
+        if (empty($this->rank) || $this->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$this->getRefreshingTime())) {
+        // Last refreshed more than 1 day ago: update Price
+            $this->price = $this->score*$this->multiplier;
+            
+            $this->initRefreshedAt();
+        }
+        
+        return $this->rank;
+    }
 }
