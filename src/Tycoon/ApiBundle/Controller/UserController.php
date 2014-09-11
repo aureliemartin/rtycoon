@@ -13,6 +13,56 @@ use Tycoon\ApiBundle\Entity\UserRestaurant;
 class UserController extends ApiController {
     
     /**
+     * @Route("/user/profile/")
+     * 
+     * User's profile
+     */
+    public function profileAction() {
+        $response = new JsonResponse();
+        
+        // Get POST
+        $datas = file_get_contents('php://input');
+	$requestDatas = json_decode($datas);
+        /**/
+        echo 'REMOVE THIS TEST'."\n";
+        $requestDatas = array(
+            'userFacebookID' => '1000041103256836'
+        );
+        $requestDatas = (object)$requestDatas;
+        /**/
+        
+        if (!empty($requestDatas->userFacebookID)) {
+            $manager = $this->getDoctrine()->getManager();
+            
+            // Get current user
+            $userRepo = $manager->getRepository('TycoonApiBundle:User');
+            $currentUser = $userRepo->findOneByFacebookId($requestDatas->userFacebookID);
+            if (empty($currentUser)) {
+                $currentUser = new User();
+                $currentUser->setFacebookId($requestDatas->userFacebookID);
+                $manager->persist($currentUser);
+            }
+
+            $response->setData(
+                array(
+                    'success' => array(
+                        'user' => array(
+                            'userID' => $currentUser->getId(),
+                            'money' => $currentUser->getMoney()
+                        )
+                    )
+                )
+            );
+            
+            $manager->flush();
+        } else {
+            $response->setData(array('error' => 'Please send your Facebook ID.'));
+        }
+        
+        return $response;
+    }
+    
+    /**
      * @Route("/user/buyrestaurant/")
      * 
      * Buy a restaurant
