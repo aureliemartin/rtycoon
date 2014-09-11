@@ -124,6 +124,14 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
+        /**
+        echo 'REMOVE THIS TEST'."\n";
+        $requestDatas = array(
+            'userFacebookID' => '1100001103256836',
+            'restaurantID' => '343'
+        );
+        $requestDatas = (object)$requestDatas;
+        /**/
         
         if (!empty($requestDatas->userFacebookID) && !empty($requestDatas->restaurantID)) {
             $manager = $this->getDoctrine()->getManager();
@@ -159,6 +167,7 @@ class UserController extends ApiController {
                     }
 
                     $restaurantPrice = $currentRestaurant->getPrice();
+                    $discountedPrice = $this->_getDiscountedPrice($currentUser, $currentRestaurant);
 
                     if ($currentUser->getMoney() >= $restaurantPrice) {
                         $userRestaurant = new UserRestaurant();
@@ -168,7 +177,7 @@ class UserController extends ApiController {
                         $currentUser->addUserRestaurant($userRestaurant);
                         $currentRestaurant->addUserRestaurant($userRestaurant);
 
-                        $currentUser->pay($restaurantPrice);
+                        $currentUser->pay($discountedPrice);
 
                         $manager->persist($userRestaurant);
                         $manager->persist($currentUser);
@@ -338,6 +347,9 @@ class UserController extends ApiController {
                     );
                 }
                 
+                $restaurantPrice = $currentRestaurant->getPrice();
+                $discountedPrice = $this->_getDiscountedPrice($currentUser, $currentRestaurant);
+                
                 $restaurantsList[] = array(
                     'restaurantID' => $currentRestaurant->getId(),
                     'name' => $currentRestaurant->getName(),
@@ -346,7 +358,8 @@ class UserController extends ApiController {
                     'url' => $currentRestaurant->getUrl(),
                     'latitude' => $currentRestaurant->getLatitude(),
                     'longitude' => $currentRestaurant->getLongitude(),
-                    'price' => $currentRestaurant->getPrice(),
+                    'price' => $restaurantPrice,
+                    'discountedPrice' => $discountedPrice,
                     'isOwner' => true,
                     'cuisines' => $cuisines
                 );

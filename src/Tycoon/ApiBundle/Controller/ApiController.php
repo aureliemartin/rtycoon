@@ -118,4 +118,50 @@ class ApiController extends Controller {
         
         return $result;
     }
+    
+    
+    /**
+     * Get restaurant discounted price for a user
+     * 
+     * @param User $currentUser
+     * @param Restaurant $restaurant
+     * @return float
+     */
+    protected function _getDiscountedPrice($currentUser, $restaurant) {
+        $manager = $this->getDoctrine()->getManager();
+            
+        $restaurantRepo = $manager->getRepository('TycoonApiBundle:Restaurant');
+        
+        $restaurantPrice = $restaurant->getPrice();
+        $discountedPrice = $restaurantPrice;
+
+        // User already ordered on Just Eat?
+        if (!empty($currentUser->getJusteatEmail())) {
+            if (empty($currentUser->getRefreshedAt()) || $currentUser->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$currentUser->getRefreshingTime())) {
+                // Last refreshed more than 1 day ago: call JustEat API to refresh datas
+                $result = $this->_callJusteat('restaurant-ids/'.$currentUser->getJusteatEmail());
+
+                $JERestaurantIds = json_decode($result);
+
+                foreach($JERestaurantIds->RestaurantIds as $JERestaurantId) {
+                    // Load restaurant
+                    $orderRestaurant = $restaurantRepo->findOneByJusteatId($JERestaurantId);
+                    if (!empty($orderRestaurant)) {
+                        $currentUser->addOrderRestaurant($orderRestaurant);
+                    }
+                }
+
+                $currentUser->initRefreshedAt();
+
+                $manager->persist($currentUser);
+                $manager->flush();
+            }
+
+            if ($currentUser->orderedInRestaurant($restaurant)) {
+                $discountedPrice = $restaurantPrice - ($restaurantPrice*0.05);
+            }
+        }
+        
+        return $discountedPrice;
+    }
 }
