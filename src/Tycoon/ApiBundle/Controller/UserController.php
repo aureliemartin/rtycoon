@@ -27,7 +27,7 @@ class UserController extends ApiController {
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
             'userFacebookID' => '1000041103256836',
-            'restaurantID' => 1
+            'restaurantID' => 2
         );
         $requestDatas = (object)$requestDatas;
         /**/
@@ -159,7 +159,6 @@ class UserController extends ApiController {
                     // Last refreshed more than 1 day ago: call JustEat API to refresh datas
                         $this->_refreshPostcode($currentPostcode);
                         $manager->refresh($currentRestaurant);
-                        $manager->persist($currentRestaurant);
                     }
 
                     
@@ -211,7 +210,7 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**/
+        /**
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
             'userFacebookID' => '1000041103256836'
@@ -233,7 +232,58 @@ class UserController extends ApiController {
             
 
             // Load restaurants
+            $restaurantRepo = $manager->getRepository('TycoonApiBundle:Restaurant');
             $userRestaurants = $currentUser->getUserRestaurants();
+            
+            $restaurantsList = array();
+            foreach($userRestaurants as $userRestaurant) {
+                // Load restaurant
+                $currentRestaurant = $userRestaurant->getRestaurant();
+                
+                // Refresh restaurant
+                $currentPostcode = null;
+                foreach($currentRestaurant->getPostcodes() as $postcode) {
+                    $currentPostcode = $postcode;
+                    break;
+                }
+
+                if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$currentRestaurant->getRefreshingTime())) {
+                // Last refreshed more than 1 day ago: call JustEat API to refresh datas
+                    $this->_refreshPostcode($currentPostcode);
+                    $manager->refresh($currentRestaurant);
+                }
+                
+                $cuisines = array();
+                foreach($currentRestaurant->getCuisines() as $cuisine) {
+                    $cuisines[] = array(
+                        'cuisineID' => $cuisine->getId(),
+                        'name' => $cuisine->getName()
+                    );
+                }
+                
+                $restaurantsList[] = array(
+                    'restaurantID' => $currentRestaurant->getId(),
+                    'name' => $currentRestaurant->getName(),
+                    'logo' => $currentRestaurant->getLogo(),
+                    'latitude' => $currentRestaurant->getLatitude(),
+                    'longitude' => $currentRestaurant->getLongitude(),
+                    'price' => $currentRestaurant->getPrice(),
+                    'isOwner' => 1,
+                    'cuisines' => $cuisines
+                );
+                
+                $manager->persist($currentRestaurant);
+            }
+            
+            $manager->flush();
+        
+            /**
+            echo '<pre>';
+            print_r($restaurantsList);
+            die();
+            /**/
+
+            $response->setData(array('restaurants' => $restaurantsList));
         } else {
             $response->setData(array('error' => 'Please send your Facebook ID.'));
         }
