@@ -69,6 +69,14 @@ class RestaurantController extends ApiController {
                     $manager->refresh($restaurant);
                 }
                 
+                $cuisines = array();
+                foreach($restaurant->getCuisines() as $cuisine) {
+                    $cuisines[] = array(
+                        'cuisineID' => $cuisine->getId(),
+                        'name' => $cuisine->getName()
+                    );
+                }
+                
                 $restaurantsList[] = array(
                     'restaurantID' => $restaurant->getId(),
                     'name' => $restaurant->getName(),
@@ -76,13 +84,20 @@ class RestaurantController extends ApiController {
                     'latitude' => $restaurant->getLatitude(),
                     'longitude' => $restaurant->getLongitude(),
                     'price' => $restaurant->getPrice(),
-                    'isOwner' => $currentUser->ownRestaurant($restaurant)
+                    'isOwner' => $currentUser->ownRestaurant($restaurant),
+                    'cuisines' => $cuisines
                 );
                 
                 $manager->persist($restaurant);
             }
             
             $manager->flush();
+        
+            /**
+            echo '<pre>';
+            print_r($restaurantsList);
+            die();
+            /**/
 
             $response->setData(array('restaurants' => $restaurantsList));
         } else {

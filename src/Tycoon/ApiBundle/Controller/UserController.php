@@ -199,4 +199,45 @@ class UserController extends ApiController {
         
         return $response;
     }
+    
+    /**
+     * @Route("/user/restaurants/list/")
+     * 
+     * List of a user's restaurants
+     */
+    public function restaurantlistAction() {
+        $response = new JsonResponse();
+        
+        // Get POST
+        $datas = file_get_contents('php://input');
+	$requestDatas = json_decode($datas);
+        /**/
+        echo 'REMOVE THIS TEST'."\n";
+        $requestDatas = array(
+            'userFacebookID' => '1000041103256836'
+        );
+        $requestDatas = (object)$requestDatas;
+        /**/
+        
+        if (!empty($requestDatas->userFacebookID)) {
+            $manager = $this->getDoctrine()->getManager();
+            
+            // Get current user
+            $userRepo = $manager->getRepository('TycoonApiBundle:User');
+            $currentUser = $userRepo->findOneByFacebookId($requestDatas->userFacebookID);
+            if (empty($currentUser)) {
+                $currentUser = new User();
+                $currentUser->setFacebookId($requestDatas->userFacebookID);
+                $manager->persist($currentUser);
+            }
+            
+
+            // Load restaurants
+            $userRestaurants = $currentUser->getUserRestaurants();
+        } else {
+            $response->setData(array('error' => 'Please send your Facebook ID.'));
+        }
+        
+        return $response;
+    }
 }

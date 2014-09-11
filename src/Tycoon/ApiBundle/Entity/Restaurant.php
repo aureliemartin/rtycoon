@@ -30,9 +30,14 @@ class Restaurant
     private $justeatId;
     
     /**
-     * @ORM\ManyToMany(targetEntity="Postcode", inversedBy="restaurants")
+     * @ORM\ManyToMany(targetEntity="Postcode", inversedBy="restaurants", cascade={"persist"})
      */
     protected $postcodes;
+    
+    /**
+     * @ORM\ManyToMany(targetEntity="Cuisine", inversedBy="restaurants")
+     */
+    protected $cuisines;
     
     /**
      * @ORM\OneToMany(targetEntity="UserRestaurant", mappedBy="restaurants")
@@ -110,6 +115,7 @@ class Restaurant
     {
         $this->postcodes = new \Doctrine\Common\Collections\ArrayCollection();
         $this->userRestaurants = new \Doctrine\Common\Collections\ArrayCollection();
+        $this->cuisines = new \Doctrine\Common\Collections\ArrayCollection();
     }
     
     /**
@@ -426,4 +432,38 @@ class Restaurant
         return $this->refreshingDays*24*60*60;
     }
 
+
+    /**
+     * Add cuisines
+     *
+     * @param \Tycoon\ApiBundle\Entity\Cuisine $cuisine
+     * @return Restaurant
+     */
+    public function addCuisine(\Tycoon\ApiBundle\Entity\Cuisine $cuisine)
+    {
+        $this->cuisines->removeElement($cuisine);
+        $this->cuisines[] = $cuisine;
+
+        return $this;
+    }
+
+    /**
+     * Remove cuisines
+     *
+     * @param \Tycoon\ApiBundle\Entity\Cuisine $cuisines
+     */
+    public function removeCuisine(\Tycoon\ApiBundle\Entity\Cuisine $cuisines)
+    {
+        $this->cuisines->removeElement($cuisines);
+    }
+
+    /**
+     * Get cuisines
+     *
+     * @return \Doctrine\Common\Collections\Collection 
+     */
+    public function getCuisines()
+    {
+        return $this->cuisines;
+    }
 }

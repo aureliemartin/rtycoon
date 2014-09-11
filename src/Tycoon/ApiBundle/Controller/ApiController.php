@@ -5,6 +5,7 @@ namespace Tycoon\ApiBundle\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 use Tycoon\ApiBundle\Entity\Restaurant;
+use Tycoon\ApiBundle\Entity\Cuisine;
 
 class ApiController extends Controller {
     
@@ -23,6 +24,7 @@ class ApiController extends Controller {
         $JERestaurants = json_decode($result);
 
         $restaurantRepo = $manager->getRepository('TycoonApiBundle:Restaurant');
+        $cuisineRepo = $manager->getRepository('TycoonApiBundle:Cuisine');
         foreach($JERestaurants->Restaurants as $JERestaurant) { 
             // Load restaurant
             $currentRestaurant = $restaurantRepo->findOneByJusteatId($JERestaurant->Id);
@@ -47,11 +49,29 @@ class ApiController extends Controller {
             if (!empty($JERestaurant->Score)) {
                 $currentRestaurant->setScore($JERestaurant->Score);
             }
+            
+            foreach($JERestaurant->CuisineTypes as $cuisineType) {
+                // Load cuisine
+                $currentCuisine = $cuisineRepo->findOneByJusteatId($cuisineType->Id);
+
+                if (empty($currentCuisine)) {
+                // Create cuisine
+                    $currentCuisine = new Cuisine();
+                    $currentCuisine->setJusteatId($cuisineType->Id);
+                    $currentCuisine->setName($cuisineType->Name);
+                }
+                
+                $currentRestaurant->addCuisine($currentCuisine);
+                $currentCuisine->addRestaurant($currentRestaurant);
+                
+                $manager->persist($currentCuisine);
+            }
 
             $currentRestaurant->addPostcode($currentPostcode);
             $currentPostcode->addRestaurant($currentRestaurant);
 
             $manager->persist($currentRestaurant);
+            $manager->flush();
         }
         
         $currentPostcode->initRefreshedAt();
