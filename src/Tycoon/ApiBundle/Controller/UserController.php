@@ -377,4 +377,40 @@ class UserController extends ApiController {
         
         return $response;
     }
+    
+    /**
+     * @Route("/user/podium/")
+     * 
+     * User's profile
+     */
+    public function podiumAction() {
+        $response = new JsonResponse();
+        
+        $manager = $this->getDoctrine()->getManager();
+            
+        // Get 10 first users
+        $userRepo = $manager->getRepository('TycoonApiBundle:User');
+        $rankUsers = $userRepo->getRanked();
+        
+        $users = array();
+        foreach($rankUsers as $rankUser) {
+            $users[] = array(
+                'userID' => $rankUser->getId(),
+                'facebookID' => $rankUser->getFacebookId(),
+                'money' => $rankUser->getMoney(),
+                'value' => $rankUser->getValue(),
+                'rank' => $rankUser->getRank()
+            );
+        }
+
+        $response->setData(
+            array(
+                'success' => array(
+                    'users' => $users
+                )
+            )
+        );
+        
+        return $response;
+    }
 }
