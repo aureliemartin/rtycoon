@@ -213,4 +213,13 @@ class User
     public function pay($price) {
         $this->money -= $price;
     }
+    
+    /**
+     * Earn money
+     * 
+     * @param float $price
+     */
+    public function earn($price) {
+        $this->money += $price;
+    }
 }

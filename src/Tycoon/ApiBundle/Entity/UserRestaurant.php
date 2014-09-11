@@ -31,6 +31,13 @@ class UserRestaurant
      **/
     private $restaurant;
 
+    /**
+     * @var decimal
+     *
+     * @ORM\Column(name="initial_price", type="decimal", scale=2)
+     */
+    private $initialPrice = 0;
+
 
     /**
      * Get id
@@ -74,6 +81,7 @@ class UserRestaurant
     public function setRestaurant(\Tycoon\ApiBundle\Entity\Restaurant $restaurant = null)
     {
         $this->restaurant = $restaurant;
+        $this->initialPrice = $restaurant->getPrice();
 
         return $this;
     }
@@ -86,5 +94,28 @@ class UserRestaurant
     public function getRestaurant()
     {
         return $this->restaurant;
+    }
+
+    /**
+     * Set initialPrice
+     *
+     * @param string $initialPrice
+     * @return UserRestaurant
+     */
+    public function setInitialPrice($initialPrice)
+    {
+        $this->initialPrice = $initialPrice;
+
+        return $this;
+    }
+
+    /**
+     * Get initialPrice
+     *
+     * @return string 
+     */
+    public function getInitialPrice()
+    {
+        return $this->initialPrice;
     }
 }

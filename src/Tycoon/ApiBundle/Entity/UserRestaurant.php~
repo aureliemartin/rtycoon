@@ -7,7 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * UserRestaurant
  *
- * @ORM\Table()
+ * @ORM\Table(name="user_restaurant")
  * @ORM\Entity(repositoryClass="Tycoon\ApiBundle\Entity\UserRestaurantRepository")
  */
 class UserRestaurant
@@ -30,6 +30,13 @@ class UserRestaurant
      * @ORM\ManyToOne(targetEntity="Restaurant", inversedBy="userRestaurants")
      **/
     private $restaurant;
+
+    /**
+     * @var decimal
+     *
+     * @ORM\Column(name="initial_price", type="decimal", scale=2)
+     */
+    private $initialPrice = 0;
 
 
     /**
@@ -74,6 +81,7 @@ class UserRestaurant
     public function setRestaurant(\Tycoon\ApiBundle\Entity\Restaurant $restaurant = null)
     {
         $this->restaurant = $restaurant;
+        $this->initialPrice = $restaurant->getPrice();
 
         return $this;
     }

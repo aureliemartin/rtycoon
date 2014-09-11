@@ -400,11 +400,11 @@ class Restaurant
     /**
      * Remove userRestaurants
      *
-     * @param \Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants
+     * @param \Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurant
      */
-    public function removeUserRestaurant(\Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurants)
+    public function removeUserRestaurant(\Tycoon\ApiBundle\Entity\UserRestaurant $userRestaurant)
     {
-        $this->userRestaurants->removeElement($userRestaurants);
+        $this->userRestaurants->removeElement($userRestaurant);
     }
 
     /**
