@@ -201,6 +201,7 @@ class RestaurantController extends ApiController {
                     $restaurant['profitSinceLastLogin'] = $userRestaurant->getProfit();
                     $restaurant['costSinceLastLogin'] = $userRestaurant->getCost();
                     $restaurant['totalProfit'] = $userRestaurant->getTotalProfit() - $userRestaurant->getTotalCost();
+                    $restaurant['money'] = $currentUser->getMoney();
                     
                     $manager->persist($userRestaurant);
                     $manager->persist($currentUser);
