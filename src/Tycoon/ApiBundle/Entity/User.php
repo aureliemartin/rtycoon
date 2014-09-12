@@ -358,6 +358,10 @@ class User
         return $this;
     }
     
+    
+    /**
+     * @ORM\PrePersist
+     */
     public function initRefreshedAt() {
         $this->refreshedAt = new \DateTime();
     }
