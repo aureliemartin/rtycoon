@@ -153,7 +153,7 @@ class Restaurant
      */
     private $minScore = 0.5;
     private $profitMultiplier = 220.2;
-    private $costMultiplier = 110.1;
+    private $costMultiplier = 156.1;
     
     
     /**
