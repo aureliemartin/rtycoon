@@ -27,8 +27,8 @@ class UserController extends ApiController {
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
             'userFacebookID' => '1100001103256836',
-            'lastname' => 'Martin',
-            'firstname' => 'Aurelie'
+            'lastName' => 'Martin',
+            'firstName' => 'Aurelie'
         );
         $requestDatas = (object)$requestDatas;
         /**/
@@ -44,11 +44,11 @@ class UserController extends ApiController {
                 $currentUser->setFacebookId($requestDatas->userFacebookID);
             }
             
-            if (!empty($requestDatas->lastname)) {
-                $currentUser->setLastname($requestDatas->lastname);
+            if (!empty($requestDatas->lastName)) {
+                $currentUser->setLastname($requestDatas->lastName);
             }
-            if (!empty($requestDatas->firstname)) {
-                $currentUser->setFirstname($requestDatas->firstname);
+            if (!empty($requestDatas->firstName)) {
+                $currentUser->setFirstname($requestDatas->firstName);
             }
             
             $manager->persist($currentUser);
