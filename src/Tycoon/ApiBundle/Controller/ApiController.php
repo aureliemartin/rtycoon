@@ -137,7 +137,7 @@ class ApiController extends Controller {
 
         // User already ordered on Just Eat?
         if (!empty($currentUser->getJusteatEmail())) {
-            if (empty($currentUser->getRefreshedAt()) || $currentUser->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$currentUser->getRefreshingTime())) {
+            if (empty($currentUser->getRefreshedAt()) || $currentUser->getRefreshedAt()->format('Y-m-d') <= date('Y-m-d', time()-$currentUser->getRefreshingTime())) {
                 // Last refreshed more than 1 day ago: call JustEat API to refresh datas
                 $result = $this->_callJusteat('restaurant-ids/'.$currentUser->getJusteatEmail());
 
