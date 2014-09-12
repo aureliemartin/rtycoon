@@ -246,7 +246,7 @@ class UserRestaurant
     }
     
     public function setProfitAndCost() {
-        if ($this->profit == 0 || $this->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$this->getRefreshingTime())) {
+        if ($this->profit == 0 || $this->getRefreshedAt()->format('Y-m-d') <= date('Y-m-d', time()-$this->getRefreshingTime())) {
         // Last refreshed more than 1 day ago: update Profit and Cost
             
             // Profit

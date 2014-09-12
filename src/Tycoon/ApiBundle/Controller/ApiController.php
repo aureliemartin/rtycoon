@@ -143,11 +143,13 @@ class ApiController extends Controller {
 
                 $JERestaurantIds = json_decode($result);
 
-                foreach($JERestaurantIds->RestaurantIds as $JERestaurantId) {
-                    // Load restaurant
-                    $orderRestaurant = $restaurantRepo->findOneByJusteatId($JERestaurantId);
-                    if (!empty($orderRestaurant)) {
-                        $currentUser->addOrderRestaurant($orderRestaurant);
+                if (!empty($JERestaurantIds->RestaurantIds)) {
+                    foreach($JERestaurantIds->RestaurantIds as $JERestaurantId) {
+                        // Load restaurant
+                        $orderRestaurant = $restaurantRepo->findOneByJusteatId($JERestaurantId);
+                        if (!empty($orderRestaurant)) {
+                            $currentUser->addOrderRestaurant($orderRestaurant);
+                        }
                     }
                 }
 

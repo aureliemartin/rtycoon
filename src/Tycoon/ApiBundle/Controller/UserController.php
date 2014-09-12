@@ -23,6 +23,15 @@ class UserController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
+        /**
+        echo 'REMOVE THIS TEST'."\n";
+        $requestDatas = array(
+            'userFacebookID' => '1100001103256836',
+            'lastname' => 'Martin',
+            'firstname' => 'Aurelie'
+        );
+        $requestDatas = (object)$requestDatas;
+        /**/
         
         if (!empty($requestDatas->userFacebookID)) {
             $manager = $this->getDoctrine()->getManager();
@@ -33,8 +42,16 @@ class UserController extends ApiController {
             if (empty($currentUser)) {
                 $currentUser = new User();
                 $currentUser->setFacebookId($requestDatas->userFacebookID);
-                $manager->persist($currentUser);
             }
+            
+            if (!empty($requestDatas->lastname)) {
+                $currentUser->setLastname($requestDatas->lastname);
+            }
+            if (!empty($requestDatas->firstname)) {
+                $currentUser->setFirstname($requestDatas->firstname);
+            }
+            
+            $manager->persist($currentUser);
 
             $response->setData(
                 array(
@@ -151,7 +168,7 @@ class UserController extends ApiController {
                         break;
                     }
 
-                    if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$currentRestaurant->getRefreshingTime())) {
+                    if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') <= date('Y-m-d', time()-$currentRestaurant->getRefreshingTime())) {
                     // Last refreshed more than 1 day ago: call JustEat API to refresh datas
                         $this->_refreshPostcode($currentPostcode);
                         $manager->refresh($currentRestaurant);
@@ -241,7 +258,7 @@ class UserController extends ApiController {
                         break;
                     }
 
-                    if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$currentRestaurant->getRefreshingTime())) {
+                    if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') <= date('Y-m-d', time()-$currentRestaurant->getRefreshingTime())) {
                     // Last refreshed more than 1 day ago: call JustEat API to refresh datas
                         $this->_refreshPostcode($currentPostcode);
                         $manager->refresh($currentRestaurant);
@@ -325,7 +342,7 @@ class UserController extends ApiController {
                     break;
                 }
 
-                if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$currentRestaurant->getRefreshingTime())) {
+                if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') <= date('Y-m-d', time()-$currentRestaurant->getRefreshingTime())) {
                 // Last refreshed more than 1 day ago: call JustEat API to refresh datas
                     $this->_refreshPostcode($currentPostcode);
                     $manager->refresh($currentRestaurant);
@@ -389,6 +406,8 @@ class UserController extends ApiController {
             $users[] = array(
                 'userID' => $rankUser->getId(),
                 'facebookID' => $rankUser->getFacebookId(),
+                'lastname' => $rankUser->getLastname(),
+                'firstname' => $rankUser->getFirstname(),
                 'money' => $rankUser->getMoney(),
                 'value' => $rankUser->getValue(),
                 'rank' => $rankUser->getRank()

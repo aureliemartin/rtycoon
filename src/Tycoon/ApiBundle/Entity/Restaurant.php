@@ -265,7 +265,7 @@ class Restaurant
      */
     public function getPrice()
     {
-        if ($this->price == 0 || $this->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$this->getRefreshingTime())) {
+        if ($this->price == 0 || $this->getRefreshedAt()->format('Y-m-d') <= date('Y-m-d', time()-$this->getRefreshingTime())) {
         // Last refreshed more than 1 day ago: update Price
             $this->price = $this->score*$this->multiplier +500;
             

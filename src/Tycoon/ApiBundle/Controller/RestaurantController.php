@@ -23,10 +23,10 @@ class RestaurantController extends ApiController {
         // Get POST
         $datas = file_get_contents('php://input');
 	$requestDatas = json_decode($datas);
-        /**
+        /**/
         echo 'REMOVE THIS TEST'."\n";
         $requestDatas = array(
-            'postcode' => 'N225DE',
+            'postcode' => 'EC2A',
             'userFacebookID' => '1100001103256836'
         );
         $requestDatas = (object)$requestDatas;
@@ -55,15 +55,14 @@ class RestaurantController extends ApiController {
                 $currentPostcode->setPostcode($requestDatas->postcode);
             }
 
-            if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$currentPostcode->getRefreshingTime())) {
+            if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') <= date('Y-m-d', time()-$currentPostcode->getRefreshingTime())) {
             // Last refreshed more than 30 days ago: call JustEat API to refresh datas
                 $currentPostcode = $this->_refreshPostcode($currentPostcode);
             }
             
             $restaurantsList = array();
             foreach($currentPostcode->getRestaurants() as $restaurant) {
-                
-                if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$restaurant->getRefreshingTime())) {
+                if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') <= date('Y-m-d', time()-$restaurant->getRefreshingTime())) {
                 // Last refreshed more than 1 day ago: call JustEat API to refresh datas
                     $this->_refreshPostcode($currentPostcode);
                     $manager->refresh($restaurant);
@@ -159,7 +158,7 @@ class RestaurantController extends ApiController {
                     break;
                 }
 
-                if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') < date('Y-m-d', time()-$currentRestaurant->getRefreshingTime())) {
+                if (empty($currentPostcode->getRefreshedAt()) || $currentPostcode->getRefreshedAt()->format('Y-m-d') <= date('Y-m-d', time()-$currentRestaurant->getRefreshingTime())) {
                 // Last refreshed more than 30 days ago: call JustEat API to refresh datas
                     $currentPostcode = $this->_refreshPostcode($currentPostcode);
                     $manager->refresh($currentRestaurant);

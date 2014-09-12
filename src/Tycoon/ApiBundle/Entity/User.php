@@ -32,6 +32,20 @@ class User
     /**
      * @var string
      *
+     * @ORM\Column(name="lastname", type="string", length=50)
+     */
+    private $lastname = '';
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="firstname", type="string", length=50)
+     */
+    private $firstname = '';
+
+    /**
+     * @var string
+     *
      * @ORM\Column(name="justeat_email", type="string", length=50)
      */
     private $justeatEmail = '';
@@ -55,7 +69,7 @@ class User
      * @ORM\Column(name="money", type="decimal", scale=2)
      */
     private $money = 0;
-    private $startingMoney = 4000;
+    private $startingMoney = 14000;
 
     /**
      * @var integer
@@ -401,5 +415,51 @@ class User
     public function getOrderRestaurants()
     {
         return $this->orderRestaurants;
+    }
+
+    /**
+     * Set lastname
+     *
+     * @param string $lastname
+     * @return User
+     */
+    public function setLastname($lastname)
+    {
+        $this->lastname = $lastname;
+
+        return $this;
+    }
+
+    /**
+     * Get lastname
+     *
+     * @return string 
+     */
+    public function getLastname()
+    {
+        return $this->lastname;
+    }
+
+    /**
+     * Set firstname
+     *
+     * @param string $firstname
+     * @return User
+     */
+    public function setFirstname($firstname)
+    {
+        $this->firstname = $firstname;
+
+        return $this;
+    }
+
+    /**
+     * Get firstname
+     *
+     * @return string 
+     */
+    public function getFirstname()
+    {
+        return $this->firstname;
     }
 }
